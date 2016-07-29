@@ -4,68 +4,126 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.udacity.gamedev.gigagal.Level;
 import com.udacity.gamedev.gigagal.util.Assets;
 import com.udacity.gamedev.gigagal.util.Constants;
+import com.udacity.gamedev.gigagal.util.Enums;
+import com.udacity.gamedev.gigagal.util.Enums.Direction;
+import com.udacity.gamedev.gigagal.util.Enums.JumpState;
+import com.udacity.gamedev.gigagal.util.Enums.WalkState;
+import com.udacity.gamedev.gigagal.util.Utils;
 
 public class GigaGal {
 
     public final static String TAG = GigaGal.class.getName();
 
+    Vector2 spawnLocation;
     Vector2 position;
     Vector2 lastFramePosition;
     Vector2 velocity;
 
-    Facing facing;
+    Direction facing;
     JumpState jumpState;
     WalkState walkState;
 
     long walkStartTime;
     long jumpStartTime;
 
-    public GigaGal() {
-        position = new Vector2(20, 20);
-        lastFramePosition = new Vector2(position);
+    Level level;
+
+    public GigaGal(Vector2 spawnLocation, Level level) {
+        this.spawnLocation = spawnLocation;
+        this.level = level;
+        position = new Vector2();
+        lastFramePosition = new Vector2();
         velocity = new Vector2();
-        jumpState = JumpState.FALLING;
-        facing = Facing.RIGHT;
-        walkState = WalkState.STANDING;
+        init();
+    }
+
+
+    public void init() {
+        position.set(spawnLocation);
+        lastFramePosition.set(spawnLocation);
+        velocity.setZero();
+        jumpState = Enums.JumpState.FALLING;
+        facing = Direction.RIGHT;
+        walkState = Enums.WalkState.NOT_WALKING;
+    }
+
+    public Vector2 getPosition() {
+        return position;
     }
 
     public void update(float delta, Array<Platform> platforms) {
+
         lastFramePosition.set(position);
         velocity.y -= Constants.GRAVITY;
         position.mulAdd(velocity, delta);
 
-        if (jumpState != JumpState.JUMPING) {
-            jumpState = JumpState.FALLING;
+        if (position.y < Constants.KILL_PLANE) {
+            init();
+        }
 
-            if (position.y - Constants.GIGAGAL_EYE_HEIGHT < 0) {
-                jumpState = JumpState.GROUNDED;
-                position.y = Constants.GIGAGAL_EYE_HEIGHT;
-                velocity.y = 0;
+        // Land on/fall off platforms
+        if (jumpState != Enums.JumpState.JUMPING) {
+            // TODO: If GigaGal is not RECOILING, set FALLING jump state
+            if (jumpState != JumpState.RECOILING) {
+                jumpState = Enums.JumpState.FALLING;
             }
 
             for (Platform platform : platforms) {
                 if (landedOnPlatform(platform)) {
-                    jumpState = JumpState.GROUNDED;
+                    jumpState = Enums.JumpState.GROUNDED;
                     velocity.y = 0;
+                    // TODO: Zero horizontal velocity
+                    velocity.x = 0;
                     position.y = platform.top + Constants.GIGAGAL_EYE_HEIGHT;
                 }
             }
         }
 
-        if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            moveLeft(delta);
-        } else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            moveRight(delta);
-        } else {
-            walkState = WalkState.STANDING;
+        // Collide with enemies
+
+        Rectangle gigaGalBounds = new Rectangle(
+                position.x - Constants.GIGAGAL_STANCE_WIDTH / 2,
+                position.y - Constants.GIGAGAL_EYE_HEIGHT,
+                Constants.GIGAGAL_STANCE_WIDTH,
+                Constants.GIGAGAL_HEIGHT);
+
+        for (Enemy enemy : level.getEnemies()) {
+            Rectangle enemyBounds = new Rectangle(
+                    enemy.position.x - Constants.ENEMY_COLLISION_RADIUS,
+                    enemy.position.y - Constants.ENEMY_COLLISION_RADIUS,
+                    2 * Constants.ENEMY_COLLISION_RADIUS,
+                    2 * Constants.ENEMY_COLLISION_RADIUS
+            );
+            if (gigaGalBounds.overlaps(enemyBounds)) {
+
+                if (position.x < enemy.position.x) {
+                    recoilFromEnemy(Direction.LEFT);
+                } else {
+                    recoilFromEnemy(Direction.RIGHT);
+                }
+            }
         }
 
+        // Move left/right
+        // TODO: Disable left/right movement if RECOILING
+        if (jumpState != JumpState.RECOILING) {
+            if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+                moveLeft(delta);
+            } else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+                moveRight(delta);
+            } else {
+                walkState = Enums.WalkState.NOT_WALKING;
+            }
+        }
+
+        // Jump
         if (Gdx.input.isKeyPressed(Keys.Z)) {
             switch (jumpState) {
                 case GROUNDED:
@@ -77,6 +135,8 @@ public class GigaGal {
         } else {
             endJump();
         }
+
+
     }
 
     boolean landedOnPlatform(Platform platform) {
@@ -99,35 +159,32 @@ public class GigaGal {
 
 
     private void moveLeft(float delta) {
-        if (jumpState == JumpState.GROUNDED && walkState != WalkState.WALKING) {
+        if (jumpState == Enums.JumpState.GROUNDED && walkState != Enums.WalkState.WALKING) {
             walkStartTime = TimeUtils.nanoTime();
         }
-        walkState = WalkState.WALKING;
-        facing = Facing.LEFT;
+        walkState = Enums.WalkState.WALKING;
+        facing = Direction.LEFT;
         position.x -= delta * Constants.GIGAGAL_MOVE_SPEED;
     }
 
-
     private void moveRight(float delta) {
-        if (jumpState == JumpState.GROUNDED && walkState != WalkState.WALKING) {
+        if (jumpState == Enums.JumpState.GROUNDED && walkState != Enums.WalkState.WALKING) {
             walkStartTime = TimeUtils.nanoTime();
         }
-        walkState = WalkState.WALKING;
-        facing = Facing.RIGHT;
+        walkState = Enums.WalkState.WALKING;
+        facing = Direction.RIGHT;
         position.x += delta * Constants.GIGAGAL_MOVE_SPEED;
     }
 
-
     private void startJump() {
-        jumpState = JumpState.JUMPING;
+        jumpState = Enums.JumpState.JUMPING;
         jumpStartTime = TimeUtils.nanoTime();
         continueJump();
     }
 
     private void continueJump() {
-        if (jumpState == JumpState.JUMPING) {
-            float jumpDuration = MathUtils.nanoToSec * (TimeUtils.nanoTime() - jumpStartTime);
-            if (jumpDuration < Constants.MAX_JUMP_DURATION) {
+        if (jumpState == Enums.JumpState.JUMPING) {
+            if (Utils.secondsSince(jumpStartTime) < Constants.MAX_JUMP_DURATION) {
                 velocity.y = Constants.JUMP_SPEED;
             } else {
                 endJump();
@@ -136,62 +193,48 @@ public class GigaGal {
     }
 
     private void endJump() {
-        if (jumpState == JumpState.JUMPING) {
-            jumpState = JumpState.FALLING;
+        if (jumpState == Enums.JumpState.JUMPING) {
+            jumpState = Enums.JumpState.FALLING;
+        }
+    }
+
+    private void recoilFromEnemy(Direction direction) {
+
+        // TODO: Set RECOILING jump state
+        jumpState = JumpState.RECOILING;
+        velocity.y = Constants.KNOCKBACK_VELOCITY.y;
+
+        if (direction == Direction.LEFT) {
+            velocity.x = -Constants.KNOCKBACK_VELOCITY.x;
+        } else {
+            velocity.x = Constants.KNOCKBACK_VELOCITY.x;
         }
     }
 
     public void render(SpriteBatch batch) {
         TextureRegion region = Assets.instance.gigaGalAssets.standingRight;
 
-        if (facing == Facing.RIGHT && jumpState != JumpState.GROUNDED) {
+        if (facing == Direction.RIGHT && jumpState != Enums.JumpState.GROUNDED) {
             region = Assets.instance.gigaGalAssets.jumpingRight;
-        } else if (facing == Facing.RIGHT && walkState == WalkState.STANDING) {
+        } else if (facing == Direction.RIGHT && walkState == Enums.WalkState.NOT_WALKING) {
             region = Assets.instance.gigaGalAssets.standingRight;
-        } else if (facing == Facing.RIGHT && walkState == WalkState.WALKING) {
-            float walkTimeSeconds = MathUtils.nanoToSec * (TimeUtils.nanoTime() - walkStartTime);
+        } else if (facing == Direction.RIGHT && walkState == Enums.WalkState.WALKING) {
+            float walkTimeSeconds = Utils.secondsSince(walkStartTime);
             region = Assets.instance.gigaGalAssets.walkingRightAnimation.getKeyFrame(walkTimeSeconds);
-        } else if (facing == Facing.LEFT && jumpState != JumpState.GROUNDED) {
+        } else if (facing == Direction.LEFT && jumpState != Enums.JumpState.GROUNDED) {
             region = Assets.instance.gigaGalAssets.jumpingLeft;
-        } else if (facing == Facing.LEFT && walkState == WalkState.STANDING) {
+        } else if (facing == Direction.LEFT && walkState == Enums.WalkState.NOT_WALKING) {
             region = Assets.instance.gigaGalAssets.standingLeft;
-        } else if (facing == Facing.LEFT && walkState == WalkState.WALKING) {
-            float walkTimeSeconds = MathUtils.nanoToSec * (TimeUtils.nanoTime() - walkStartTime);
+        } else if (facing == Direction.LEFT && walkState == Enums.WalkState.WALKING) {
+            float walkTimeSeconds = Utils.secondsSince(walkStartTime);
             region = Assets.instance.gigaGalAssets.walkingLeftAnimation.getKeyFrame(walkTimeSeconds);
         }
 
-        batch.draw(
-                region.getTexture(),
+        Utils.drawTextureRegion(batch, region,
                 position.x - Constants.GIGAGAL_EYE_POSITION.x,
-                position.y - Constants.GIGAGAL_EYE_POSITION.y,
-                0,
-                0,
-                region.getRegionWidth(),
-                region.getRegionHeight(),
-                1,
-                1,
-                0,
-                region.getRegionX(),
-                region.getRegionY(),
-                region.getRegionWidth(),
-                region.getRegionHeight(),
-                false,
-                false);
+                position.y - Constants.GIGAGAL_EYE_POSITION.y
+        );
+
     }
 
-    enum JumpState {
-        JUMPING,
-        FALLING,
-        GROUNDED
-    }
-
-    enum Facing {
-        LEFT,
-        RIGHT
-    }
-
-    enum WalkState {
-        STANDING,
-        WALKING
-    }
 }
