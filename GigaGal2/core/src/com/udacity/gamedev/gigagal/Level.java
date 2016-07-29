@@ -13,8 +13,7 @@ public class Level {
     public Level() {
         gigaGal = new GigaGal();
         platforms = new Array<Platform>();
-
-        platforms.add(new Platform(70, 30, 20, 20));
+        addDebugPlatforms();
     }
 
     public void update(float delta) {
@@ -30,4 +29,14 @@ public class Level {
         batch.end();
     }
 
+    /**
+     * TODO: Add more platforms to create a fun jumping challenge!
+     *
+     * Note that you'll want to add the platforms in the order you want them drawn. That'll
+     * generally mean you want the platforms at the top of the screen to be rendered before the ones
+     * lower down.
+     */
+    private void addDebugPlatforms() {
+       
+    }
 }
