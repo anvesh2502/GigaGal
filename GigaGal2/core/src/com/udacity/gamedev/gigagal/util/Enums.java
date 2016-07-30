@@ -12,7 +12,6 @@ public class Enums {
         JUMPING,
         FALLING,
         GROUNDED,
-        // TODO: Add RECOILING jump state
         RECOILING
     }
 

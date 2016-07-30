@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.udacity.gamedev.gigagal.Level;
 import com.udacity.gamedev.gigagal.util.Assets;
@@ -33,6 +34,10 @@ public class GigaGal {
     long walkStartTime;
     long jumpStartTime;
 
+    // TODO: Add ammo count
+    int ammo_count;
+
+
     Level level;
 
     public GigaGal(Vector2 spawnLocation, Level level) {
@@ -52,6 +57,10 @@ public class GigaGal {
         jumpState = Enums.JumpState.FALLING;
         facing = Direction.RIGHT;
         walkState = Enums.WalkState.NOT_WALKING;
+
+        // TODO: Initialize ammo
+        ammo_count=Constants.INITIAL_AMMO;
+
     }
 
     public Vector2 getPosition() {
@@ -70,7 +79,6 @@ public class GigaGal {
 
         // Land on/fall off platforms
         if (jumpState != Enums.JumpState.JUMPING) {
-            // TODO: If GigaGal is not RECOILING, set FALLING jump state
             if (jumpState != JumpState.RECOILING) {
                 jumpState = Enums.JumpState.FALLING;
             }
@@ -79,7 +87,6 @@ public class GigaGal {
                 if (landedOnPlatform(platform)) {
                     jumpState = Enums.JumpState.GROUNDED;
                     velocity.y = 0;
-                    // TODO: Zero horizontal velocity
                     velocity.x = 0;
                     position.y = platform.top + Constants.GIGAGAL_EYE_HEIGHT;
                 }
@@ -112,7 +119,6 @@ public class GigaGal {
         }
 
         // Move left/right
-        // TODO: Disable left/right movement if RECOILING
         if (jumpState != JumpState.RECOILING) {
             if (Gdx.input.isKeyPressed(Keys.LEFT)) {
                 moveLeft(delta);
@@ -136,7 +142,48 @@ public class GigaGal {
             endJump();
         }
 
+        // TODO: Check if GigaGal should pick up a powerup
+        // This is a tough one. Check for overlaps similar to how we detect collisions with enemies, then remove any picked up powerups (and update GigaGal's ammo count)
+        // Remember to check out the solution project if you run into trouble!
+        DelayedRemovalArray<Powerup> powerups = level.getPowerups();
+        powerups.begin();
+        for (int i = 0; i < powerups.size; i++) {
+            Powerup powerup = powerups.get(i);
+            Rectangle powerupBounds = new Rectangle(
+                    powerup.position.x - Constants.POWERUP_CENTER.x,
+                    powerup.position.y - Constants.POWERUP_CENTER.y,
+                    Assets.instance.powerupAssets.powerup.getRegionWidth(),
+                    Assets.instance.powerupAssets.powerup.getRegionHeight()
+            );
+            if (gigaGalBounds.overlaps(powerupBounds)) {
+                ammo_count += Constants.POWERUP_AMMO;
+                powerups.removeIndex(i);
+            }
+        }
+        powerups.end();
 
+
+
+        // TODO: Check if GigaGal has any ammo left
+        if (Gdx.input.isKeyJustPressed(Keys.X) && ammo_count>0) {
+
+            // TODO: Decrement ammo
+            ammo_count-=1;
+            Vector2 bulletPosition;
+
+            if (facing == Direction.RIGHT) {
+                bulletPosition = new Vector2(
+                        position.x + Constants.GIGAGAL_CANNON_OFFSET.x,
+                        position.y + Constants.GIGAGAL_CANNON_OFFSET.y
+                );
+            } else {
+                bulletPosition = new Vector2(
+                        position.x - Constants.GIGAGAL_CANNON_OFFSET.x,
+                        position.y + Constants.GIGAGAL_CANNON_OFFSET.y
+                );
+            }
+            level.spawnBullet(bulletPosition, facing);
+        }
     }
 
     boolean landedOnPlatform(Platform platform) {
@@ -200,7 +247,6 @@ public class GigaGal {
 
     private void recoilFromEnemy(Direction direction) {
 
-        // TODO: Set RECOILING jump state
         jumpState = JumpState.RECOILING;
         velocity.y = Constants.KNOCKBACK_VELOCITY.y;
 

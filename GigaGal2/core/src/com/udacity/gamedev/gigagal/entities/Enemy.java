@@ -15,6 +15,7 @@ public class Enemy {
 
     private final Platform platform;
     public Vector2 position;
+    public int health;
     private Direction direction;
     final long startTime;
 
@@ -23,6 +24,7 @@ public class Enemy {
         direction = Direction.RIGHT;
         position = new Vector2(platform.left, platform.top + Constants.ENEMY_CENTER.y);
         startTime = TimeUtils.nanoTime();
+        health = Constants.ENEMY_HEALTH;
     }
 
     public void update(float delta) {

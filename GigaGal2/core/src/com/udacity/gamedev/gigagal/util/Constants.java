@@ -27,6 +27,10 @@ public class Constants {
     public static final Vector2 KNOCKBACK_VELOCITY = new Vector2(200, 200);
     public static final float MAX_JUMP_DURATION = .1f;
 
+    // TODO: Add constant for GigaGal's initial ammo
+    public static final int INITIAL_AMMO=10;
+
+
     public static final String STANDING_RIGHT = "standing-right";
     public static final String STANDING_LEFT = "standing-left";
     public static final String JUMPING_RIGHT = "jumping-right";
@@ -49,5 +53,30 @@ public class Constants {
     public static final float ENEMY_MOVEMENT_SPEED = 10;
     public static final float ENEMY_BOB_AMPLITUDE = 2;
     public static final float ENEMY_BOB_PERIOD = 3.0f;
+    public static final int ENEMY_HEALTH = 5;
     public static final float ENEMY_COLLISION_RADIUS = 15;
+    public static final float ENEMY_SHOT_RADIUS = 17;
+
+    // Bullet
+    public static final String BULLET_SPRITE = "bullet";
+    public static final float BULLET_MOVE_SPEED = 150;
+    public static final Vector2 BULLET_CENTER = new Vector2(3, 2);
+
+    // Explosion
+    public static final String EXPLOSION_LARGE = "explosion-large";
+    public static final String EXPLOSION_MEDIUM = "explosion-medium";
+    public static final String EXPLOSION_SMALL = "explosion-small";
+    public static final Vector2 EXPLOSION_CENTER = new Vector2(8, 8);
+    public static final float EXPLOSION_DURATION = 0.5f;
+
+    // Powerup
+    public static final String POWERUP_SPRITE = "powerup";
+    public static final Vector2 POWERUP_CENTER = new Vector2(7, 5);
+
+
+    // TODO: Add constant for how much ammo a powerup contains
+    public static final int POWERUP_AMMO = 10;
+
+
+
 }
