@@ -21,24 +21,18 @@ import com.udacity.gamedev.gigagal.util.Utils;
 public class GigaGal {
 
     public final static String TAG = GigaGal.class.getName();
-
-    Vector2 spawnLocation;
-    Vector2 position;
-    Vector2 lastFramePosition;
-    Vector2 velocity;
-
-    Direction facing;
-    JumpState jumpState;
-    WalkState walkState;
-
-    long walkStartTime;
-    long jumpStartTime;
-
-    // TODO: Add ammo count
-    int ammo_count;
-
-
-    Level level;
+    private Level level;
+    private Vector2 spawnLocation;
+    private Vector2 position;
+    private Vector2 lastFramePosition;
+    private Vector2 velocity;
+    private Direction facing;
+    private JumpState jumpState;
+    private WalkState walkState;
+    private long walkStartTime;
+    private long jumpStartTime;
+    private int ammo;
+    private int lives;
 
     public GigaGal(Vector2 spawnLocation, Level level) {
         this.spawnLocation = spawnLocation;
@@ -49,17 +43,27 @@ public class GigaGal {
         init();
     }
 
+    public int getAmmo() {
+        return ammo;
+    }
+
+    public int getLives() {
+        return lives;
+    }
 
     public void init() {
+        ammo = Constants.INITIAL_AMMO;
+        lives = Constants.INITIAL_LIVES;
+        respawn();
+    }
+
+    private void respawn(){
         position.set(spawnLocation);
         lastFramePosition.set(spawnLocation);
         velocity.setZero();
         jumpState = Enums.JumpState.FALLING;
         facing = Direction.RIGHT;
         walkState = Enums.WalkState.NOT_WALKING;
-
-        // TODO: Initialize ammo
-        ammo_count=Constants.INITIAL_AMMO;
 
     }
 
@@ -74,7 +78,11 @@ public class GigaGal {
         position.mulAdd(velocity, delta);
 
         if (position.y < Constants.KILL_PLANE) {
-            init();
+            lives--;
+            if (lives < 0){
+//                level.gameOver();
+            }
+            respawn();
         }
 
         // Land on/fall off platforms
@@ -94,7 +102,6 @@ public class GigaGal {
         }
 
         // Collide with enemies
-
         Rectangle gigaGalBounds = new Rectangle(
                 position.x - Constants.GIGAGAL_STANCE_WIDTH / 2,
                 position.y - Constants.GIGAGAL_EYE_HEIGHT,
@@ -142,9 +149,7 @@ public class GigaGal {
             endJump();
         }
 
-        // TODO: Check if GigaGal should pick up a powerup
-        // This is a tough one. Check for overlaps similar to how we detect collisions with enemies, then remove any picked up powerups (and update GigaGal's ammo count)
-        // Remember to check out the solution project if you run into trouble!
+        // Check powerups
         DelayedRemovalArray<Powerup> powerups = level.getPowerups();
         powerups.begin();
         for (int i = 0; i < powerups.size; i++) {
@@ -156,19 +161,16 @@ public class GigaGal {
                     Assets.instance.powerupAssets.powerup.getRegionHeight()
             );
             if (gigaGalBounds.overlaps(powerupBounds)) {
-                ammo_count += Constants.POWERUP_AMMO;
+                ammo += Constants.POWERUP_AMMO;
                 powerups.removeIndex(i);
             }
         }
         powerups.end();
 
+        // Shoot
+        if (Gdx.input.isKeyJustPressed(Keys.X) && ammo > 0) {
 
-
-        // TODO: Check if GigaGal has any ammo left
-        if (Gdx.input.isKeyJustPressed(Keys.X) && ammo_count>0) {
-
-            // TODO: Decrement ammo
-            ammo_count-=1;
+            ammo--;
             Vector2 bulletPosition;
 
             if (facing == Direction.RIGHT) {
@@ -276,10 +278,7 @@ public class GigaGal {
             region = Assets.instance.gigaGalAssets.walkingLeftAnimation.getKeyFrame(walkTimeSeconds);
         }
 
-        Utils.drawTextureRegion(batch, region,
-                position.x - Constants.GIGAGAL_EYE_POSITION.x,
-                position.y - Constants.GIGAGAL_EYE_POSITION.y
-        );
+        Utils.drawTextureRegion(batch, region, position, Constants.GIGAGAL_EYE_POSITION);
 
     }
 

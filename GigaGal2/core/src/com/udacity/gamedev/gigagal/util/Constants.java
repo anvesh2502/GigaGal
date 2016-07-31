@@ -8,17 +8,15 @@ public class Constants {
     // World/Camera
     public static final Color BACKGROUND_COLOR = Color.SKY;
     public static final float WORLD_SIZE = 160;
-    public static final float KILL_PLANE = -100;
+    public static final float KILL_PLANE = -200;
     public static final float GRAVITY = 10;
     public static final float CHASE_CAM_MOVE_SPEED = WORLD_SIZE;
-
     public static final String TEXTURE_ATLAS = "images/gigagal.pack.atlas";
-
 
     // GigaGal
     public static final Vector2 GIGAGAL_EYE_POSITION = new Vector2(16, 24);
     public static final float GIGAGAL_EYE_HEIGHT = 16.0f;
-    public static final float GIGAGAL_STANCE_WIDTH = 21.0f;
+    public static final float GIGAGAL_STANCE_WIDTH = 19.0f;
     public static final Vector2 GIGAGAL_CANNON_OFFSET = new Vector2(12, -7);
     public static final float GIGAGAL_HEIGHT = 23.0f;
     public static final float GIGAGAL_MOVE_SPEED = 100;
@@ -26,10 +24,9 @@ public class Constants {
     public static final float JUMP_SPEED = 200;
     public static final Vector2 KNOCKBACK_VELOCITY = new Vector2(200, 200);
     public static final float MAX_JUMP_DURATION = .1f;
-
-    // TODO: Add constant for GigaGal's initial ammo
-    public static final int INITIAL_AMMO=10;
-
+    public static final int INITIAL_AMMO = 10;
+    public static final int INITIAL_LIVES = 3;
+    public static final Vector2 DEFAULT_SPAWN_LOCATION = new Vector2(100, 100);
 
     public static final String STANDING_RIGHT = "standing-right";
     public static final String STANDING_LEFT = "standing-left";
@@ -72,11 +69,34 @@ public class Constants {
     // Powerup
     public static final String POWERUP_SPRITE = "powerup";
     public static final Vector2 POWERUP_CENTER = new Vector2(7, 5);
-
-
-    // TODO: Add constant for how much ammo a powerup contains
     public static final int POWERUP_AMMO = 10;
 
+    // Exit Portal
+    public static final String EXIT_PORTAL_SPRITE_1 = "exit-portal-1";
+    public static final String EXIT_PORTAL_SPRITE_2 = "exit-portal-2";
+    public static final String EXIT_PORTAL_SPRITE_3 = "exit-portal-3";
+    public static final String EXIT_PORTAL_SPRITE_4 = "exit-portal-4";
+    public static final String EXIT_PORTAL_SPRITE_5 = "exit-portal-5";
+    public static final String EXIT_PORTAL_SPRITE_6 = "exit-portal-6";
+    public static final Vector2 EXIT_PORTAL_CENTER = new Vector2(31, 31);
+    public static final float EXIT_PORTAL_FRAME_DURATION = 0.1f;
+    public static final Vector2 EXIT_PORTAL_DEFAULT_LOCATION = new Vector2(200, 200);
+
+    // Level Loading
+
+    public static final String LEVEL_DIR = "levels";
+    public static final String LEVEL_FILE_EXTENSION = "dt";
+    public static final String LEVEL_COMPOSITE = "composite";
+    public static final String LEVEL_9PATCHES = "sImage9patchs";
+    public static final String LEVEL_IMAGES = "sImages";
+    public static final String LEVEL_ERROR_MESSAGE = "There was a problem loading the level.";
+    public static final String LEVEL_IMAGENAME_KEY = "imageName";
+    public static final String LEVEL_X_KEY = "x";
+    public static final String LEVEL_Y_KEY = "y";
+    public static final String LEVEL_WIDTH_KEY = "width";
+    public static final String LEVEL_HEIGHT_KEY = "height";
+    public static final String LEVEL_IDENTIFIER_KEY = "itemIdentifier";
+    public static final String LEVEL_ENEMY_TAG = "Enemy";
 
 
 }

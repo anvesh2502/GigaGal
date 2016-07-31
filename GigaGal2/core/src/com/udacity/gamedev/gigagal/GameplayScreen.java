@@ -9,17 +9,17 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.udacity.gamedev.gigagal.util.Assets;
 import com.udacity.gamedev.gigagal.util.ChaseCam;
 import com.udacity.gamedev.gigagal.util.Constants;
+import com.udacity.gamedev.gigagal.util.LevelLoader;
 
 
 public class GameplayScreen extends ScreenAdapter {
 
     public static final String TAG = GameplayScreen.class.getName();
 
-    Level level;
     ExtendViewport gameplayViewport;
-
-    SpriteBatch batch;
+    Level level;
     ChaseCam chaseCam;
+    SpriteBatch batch;
 
     @Override
     public void show() {
@@ -29,8 +29,10 @@ public class GameplayScreen extends ScreenAdapter {
         batch = new SpriteBatch();
         gameplayViewport = new ExtendViewport(Constants.WORLD_SIZE, Constants.WORLD_SIZE);
 
-        level = new Level(gameplayViewport);
+//        level = new Level(gameplayViewport);
+//        level.initializeDebugLevel();
 
+        level = LevelLoader.load("Level1", gameplayViewport);
         chaseCam = new ChaseCam(gameplayViewport.getCamera(), level.getGigaGal());
     }
 
@@ -61,6 +63,7 @@ public class GameplayScreen extends ScreenAdapter {
         level.render(batch);
 
         batch.end();
+
 
     }
 }
