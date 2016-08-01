@@ -23,10 +23,9 @@ public class Constants {
 
     public static final float JUMP_SPEED = 200;
     public static final Vector2 KNOCKBACK_VELOCITY = new Vector2(200, 200);
-    public static final float MAX_JUMP_DURATION = .1f;
+    public static final float MAX_JUMP_DURATION = 0.1f;
     public static final int INITIAL_AMMO = 10;
     public static final int INITIAL_LIVES = 3;
-    public static final Vector2 DEFAULT_SPAWN_LOCATION = new Vector2(100, 100);
 
     public static final String STANDING_RIGHT = "standing-right";
     public static final String STANDING_LEFT = "standing-left";
@@ -79,13 +78,10 @@ public class Constants {
     public static final String EXIT_PORTAL_SPRITE_5 = "exit-portal-5";
     public static final String EXIT_PORTAL_SPRITE_6 = "exit-portal-6";
     public static final Vector2 EXIT_PORTAL_CENTER = new Vector2(31, 31);
+    public static final float EXIT_PORTAL_RADIUS = 28;
     public static final float EXIT_PORTAL_FRAME_DURATION = 0.1f;
-    public static final Vector2 EXIT_PORTAL_DEFAULT_LOCATION = new Vector2(200, 200);
 
     // Level Loading
-
-    public static final String LEVEL_DIR = "levels";
-    public static final String LEVEL_FILE_EXTENSION = "dt";
     public static final String LEVEL_COMPOSITE = "composite";
     public static final String LEVEL_9PATCHES = "sImage9patchs";
     public static final String LEVEL_IMAGES = "sImages";
@@ -97,6 +93,34 @@ public class Constants {
     public static final String LEVEL_HEIGHT_KEY = "height";
     public static final String LEVEL_IDENTIFIER_KEY = "itemIdentifier";
     public static final String LEVEL_ENEMY_TAG = "Enemy";
+    public static final String[] LEVELS = {"levels/Level1.dt", "levels/Level2.dt"};
 
+    // HUD
+    public static final float HUD_VIEWPORT_SIZE = 480;
+    public static final float HUD_MARGIN = 20;
+    public static final String HUD_AMMO_LABEL = "Ammo: ";
+    public static final String HUD_SCORE_LABEL = "Score: ";
+
+    // Onscreen Controls
+    public static final float ONSCREEN_CONTROLS_VIEWPORT_SIZE = 200;
+    public static final String MOVE_LEFT_BUTTON = "button-move-left";
+    public static final String MOVE_RIGHT_BUTTON = "button-move-right";
+    public static final String SHOOT_BUTTON = "button-shoot";
+    public static final String JUMP_BUTTON = "button-jump";
+    public static final Vector2 BUTTON_CENTER = new Vector2(15, 15);
+    public static final float BUTTON_RADIUS = 32;
+
+    // Victory/Game Over screens
+    public static final float LEVEL_END_DURATION = 5;
+    public static final String VICTORY_MESSAGE = "You are the Winner!";
+    public static final String GAME_OVER_MESSAGE = "Game Over, Gal";
+    public static final int EXPLOSION_COUNT =500;
+    public static final int ENEMY_COUNT =200;
+    public static final String FONT_FILE = "font/header.fnt";
+
+    // Scoring
+    public static final int ENEMY_KILL_SCORE = 100;
+    public static final int ENEMY_HIT_SCORE = 25;
+    public static final int POWERUP_SCORE = 50;
 
 }

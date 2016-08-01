@@ -1,7 +1,13 @@
-# Load the Rest
+# Wiring up Mobile Controls
 
-We're almost done loading up the level! Now that we have an exit portal to load, we'll load it, along with GigaGal's spawn location, and the location of any powerups that have been placed about the level.
+Now that we have our mobile controls on screen let's make them work! This will require a bit of refactoring in `GigaGal`, but it's not too tough. First we need to set our `OnscreenControls` class as an `InputAdapter`. Then we can listen for `touchDown()`, `touchUp()`, and `touchDragged()` events to figure out what buttons are being pressed.
 
-To do this, first we need to get the array of images that we placed in the level. Then, for each image, we'll save off its location. Note that the location stored in the level file is actually the bottom left corner of the image. Then we'll figure out if it's GigaGal, the exit portal, or a powerup. Finally, we'll all a new object of the appropriate type to the level, making sure we use the proper offset, so the bottom left corner of the in-game object matches where we placed the bottom left corner of the image in the level editor.
+The shoot control is the easiest. We can factor the shooting logic in `GigaGal` into its own method, then watch for a touchDown event within the shoot button, and call the shoot method.
+ 
+The jump control is harder, as we need to allow for the jump button being held down. The touch events are identified with a certain pointer, so when a touch comes down within the jump button, we hold onto that pointer ID, and tell `GigaGal` that the button is down. Then, in `render()`, we check to see if that pointer is still down. If not, we tell `GigaGal` that the jump button is no longer pressed.
 
-All the TODOs you'll need to handle are in `LevelLoader.java`. Best of luck! Note that we've already completed the code to load up GigaGal, as an example.
+The movement controls are definitely the hardest. They're handled similarly to the jump button, but we discovered in testing that players really want to be able to slide their finger from the move left button to the move right button, and vice versa. That means we need to watch `touchDragged()`, and detect when a touch that came down in the left button has been dragged into the right button, inform `GigaGal` that this has happened, and tag that pointer ID as now a touch that came down in the right button (or the other way around).
+
+Finally, for debug purposes we have been displaying the mobile controls on the desktop backend. Let's add some checks to ensure that the mobile controls are only displayed on mobile devices.
+
+Check out the TODOs in the course code!
