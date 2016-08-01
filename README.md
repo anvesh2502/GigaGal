@@ -4,6 +4,6 @@ in a desktop.The project has been built using gradle tool in Android Studio.
 
 Features implemented in this project :
 
---- Collision Detection Algorithms
+--- Collision Detection Algorithms\n
 --- Animations for player movement and activities
 --- Platforms created using Overlap 2d editor by creating JSON files for different platforms.
